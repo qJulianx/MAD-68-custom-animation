@@ -1,0 +1,29 @@
+{
+  "id": "static",
+  "name": "Static Color",
+  "description": "Stały, jednolity kolor lub statyczny gradient na wszystkich klawiszach.",
+  "supports_color": true,
+  "supports_rainbow": false,
+  "default_rainbow": false,
+  "supports_gradient": true,
+  "max_colors": 6,
+  "params": {
+    "fps": {
+      "default": 5,
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "FPS",
+      "unit": "fps"
+    },
+    "brightness": {
+      "default": 1.0,
+      "min": 0,
+      "max": 1.0,
+      "step": 0.05,
+      "label": "Jasność",
+      "unit": ""
+    }
+  },
+  "code": "brightness = params.get('brightness', 1.0)\ncolor = params.get('color', [255, 255, 255])\ngrad_on = params.get('gradientOn', False)\ngrad_colors = [c for c in params.get('gradientColors', []) if sum(c)>0]\nwidth = 1.0 / 15.0\nfor key_name, virtual_id in key_map.items():\n    base = virtual_id * 3\n    if base + 2 >= 384: continue\n    if grad_on and grad_colors:\n        kn = key_name.lower()\n        x_pos = LAYOUT_X.get(kn, 0)\n        phase = min(1.0, max(0.0, x_pos * width))\n        n = len(grad_colors)\n        if n == 1:\n            c = grad_colors[0]\n            r, g, b = c[0]*brightness, c[1]*brightness, c[2]*brightness\n        else:\n            p = phase * (n - 1)\n            idx1 = int(p)\n            idx2 = min(idx1 + 1, n - 1)\n            frac = p - idx1\n            c1, c2 = grad_colors[idx1], grad_colors[idx2]\n            r = (c1[0]*(1-frac) + c2[0]*frac) * brightness\n            g = (c1[1]*(1-frac) + c2[1]*frac) * brightness\n            b = (c1[2]*(1-frac) + c2[2]*frac) * brightness\n    else:\n        r, g, b = color[0]*brightness, color[1]*brightness, color[2]*brightness\n    matrix[base] = int(r)\n    matrix[base+1] = int(g)\n    matrix[base+2] = int(b)"
+}

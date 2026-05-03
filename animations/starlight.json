@@ -1,0 +1,15 @@
+{
+  "id": "starlight",
+  "name": "Starlight",
+  "description": "Klawisze zapalają się losowo i powoli gasną, tworząc efekt nieba pełnego gwiazd (z QMK).",
+  "supports_color": true,
+  "supports_rainbow": true,
+  "default_rainbow": false,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.02, "min": 0.005, "max": 0.1, "step": 0.005, "label": "Prędkość", "unit": "" },
+    "density": { "default": 0.3, "min": 0.1, "max": 0.7, "step": 0.05, "label": "Gęstość gwiazd", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" }
+  },
+  "code": "speed = params.get('speed', 0.02)\nbrightness = params.get('brightness', 1.0)\ncolor = params.get('color', [255, 255, 255])\nrainbow = params.get('rainbow', False)\ndensity = params.get('density', 0.3)\nfor key_name, virtual_id in key_map.items():\n    base = virtual_id * 3\n    if base + 2 >= 384:\n        continue\n    # Unikalna faza dla każdego klawisza\n    phase = (virtual_id * 2654435761) % 100000 / 100000.0\n    # Cykl jasności\n    val = (t * speed * 5.0 + phase) % 1.0\n    if val < density:\n        b = (1.0 - val / density) * brightness\n    else:\n        b = 0\n    if rainbow:\n        hue = phase\n        r, g, b_final = colorsys.hsv_to_rgb(hue, 1.0, b)\n    else:\n        r, g, b_final = color[0]/255.0*b, color[1]/255.0*b, color[2]/255.0*b\n    matrix[base] = int(r * 255)\n    matrix[base+1] = int(g * 255)\n    matrix[base+2] = int(b_final * 255)"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "solid_reactive",
+  "name": "Solid Reactive (Simulated)",
+  "description": "Klawisze zapalają się w reakcji na wirtualne uderzenia (symulacja QMK).",
+  "supports_color": true,
+  "supports_rainbow": true,
+  "default_rainbow": false,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.05, "min": 0.01, "max": 0.2, "step": 0.01, "label": "Prędkość wygasania", "unit": "" },
+    "frequency": { "default": 0.1, "min": 0.01, "max": 0.5, "step": 0.01, "label": "Częstotliwość uderzeń", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" }
+  },
+  "code": "speed = params.get('speed', 0.05)\nfreq = params.get('frequency', 0.1)\nbrightness = params.get('brightness', 1.0)\ncolor = params.get('color', [255, 0, 0])\nrainbow = params.get('rainbow', False)\nfor key_name, virtual_id in key_map.items():\n    base = virtual_id * 3\n    if base + 2 >= 384:\n        continue\n    # Symulacja uderzeń: jeśli (t + seed) % (1/freq) jest małe, to klawisz 'został naciśnięty'\n    random.seed(virtual_id)\n    seed = random.random() * 100.0\n    cycle_time = 1.0 / freq\n    time_since_hit = (t + seed) % cycle_time\n    if time_since_hit < 0.5:\n        val = (1.0 - time_since_hit / 0.5) * brightness\n    else:\n        val = 0\n    if rainbow:\n        hue = seed % 1.0\n        r, g, b_final = colorsys.hsv_to_rgb(hue, 1.0, val)\n    else:\n        r, g, b_final = color[0]/255.0*val, color[1]/255.0*val, color[2]/255.0*val\n    matrix[base] = int(r * 255)\n    matrix[base+1] = int(g * 255)\n    matrix[base+2] = int(b_final * 255)"
+}

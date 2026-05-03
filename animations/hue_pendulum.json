@@ -1,0 +1,17 @@
+{
+  "id": "hue_pendulum",
+  "name": "Hue Pendulum",
+  "description": "Odcień wybranego koloru kołysze się na boki niczym wahadło (z QMK).",
+  "supports_color": true,
+  "supports_rainbow": false,
+  "default_rainbow": false,
+  "supports_gradient": true,
+  "max_colors": 6,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.02, "min": 0.005, "max": 0.1, "step": 0.005, "label": "Prędkość", "unit": "" },
+    "swing": { "default": 0.3, "min": 0.1, "max": 1.0, "step": 0.05, "label": "Zasięg wahania", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" }
+  },
+  "code": "speed = params.get('speed', 0.02)\nbrightness = params.get('brightness', 1.0)\ncolor = params.get('color', [0, 255, 100])\nswing = params.get('swing', 0.3)\ngrad_on = params.get('gradientOn', False)\ngrad_colors = [c for c in params.get('gradientColors', []) if sum(c)>0]\nbase_hsv = colorsys.rgb_to_hsv(color[0]/255.0, color[1]/255.0, color[2]/255.0)\n\nfor key_name, virtual_id in key_map.items():\n    kn = key_name.lower()\n    base = virtual_id * 3\n    if base + 2 >= 384: continue\n    x = LAYOUT_X.get(kn, 0)\n    offset = (x / 15.0 - 0.5)\n    pendulum_offset = math.sin(t * 6.28) * swing\n    hue = (base_hsv[0] + offset * 0.2 + pendulum_offset) % 1.0\n    if grad_on and grad_colors:\n        n = len(grad_colors)\n        if n == 1:\n            c = grad_colors[0]\n            r, g, b = c[0]/255.0*brightness, c[1]/255.0*brightness, c[2]/255.0*brightness\n        else:\n            p = hue * n\n            idx1 = int(p) % n\n            idx2 = (idx1 + 1) % n\n            frac = p - int(p)\n            c1, c2 = grad_colors[idx1], grad_colors[idx2]\n            r = (c1[0]*(1-frac) + c2[0]*frac) / 255.0 * brightness\n            g = (c1[1]*(1-frac) + c2[1]*frac) / 255.0 * brightness\n            b = (c1[2]*(1-frac) + c2[2]*frac) / 255.0 * brightness\n    else:\n        r, g, b = colorsys.hsv_to_rgb(hue, base_hsv[1], brightness)\n    matrix[base] = int(r * 255)\n    matrix[base+1] = int(g * 255)\n    matrix[base+2] = int(b * 255)"
+}

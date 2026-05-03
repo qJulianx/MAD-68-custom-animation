@@ -1,0 +1,18 @@
+{
+  "id": "rainbow_chevron",
+  "name": "Rainbow Chevron",
+  "description": "Wzór tęczowej fali w kształcie litery V wędrujący po klawiaturze (z QMK).",
+  "supports_color": false,
+  "supports_rainbow": false,
+  "default_rainbow": false,
+  "supports_gradient": true,
+  "max_colors": 6,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.02, "min": 0.005, "max": 0.1, "step": 0.005, "label": "Prędkość", "unit": "" },
+    "angle": { "default": 0.5, "min": 0.1, "max": 2.0, "step": 0.1, "label": "Kąt Chevronu", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" },
+    "reverse": { "default": false, "type": "boolean", "label": "Odwróć kierunek" }
+  },
+  "code": "brightness = params.get('brightness', 1.0)\nreverse = params.get('reverse', False)\nangle_mod = params.get('angle', 0.5)\ngrad_on = params.get('gradientOn', False)\ngrad_colors = [c for c in params.get('gradientColors', []) if sum(c)>0]\nLY = {'esc':0,'1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0,'0':0,'-':0,'=':0,'backspace':0,'ins':0,'tab':1,'q':1,'w':1,'e':1,'r':1,'t':1,'y':1,'u':1,'i':1,'o':1,'p':1,'[':1,']':1,'\\\\':1,'delete':1,'caps lock':2,'a':2,'s':2,'d':2,'f':2,'g':2,'h':2,'j':2,'k':2,'l':2,';':2,\"'\":2,'enter':2,'pgup':2,'shift':3,'z':3,'x':3,'c':3,'v':3,'b':3,'n':3,'m':3,',':3,'.':3,'/':3,'right shift':3,'up':3,'pgdn':3,'ctrl':4,'left windows':4,'alt':4,'space':4,'alt gr':4,'fn':4,'right ctrl':4,'left':4,'down':4,'right':4}\nfor key_name, virtual_id in key_map.items():\n    kn = key_name.lower()\n    base = virtual_id * 3\n    if base + 2 >= 384: continue\n    x = LAYOUT_X.get(kn, 0)\n    y = LY.get(kn, 0)\n    dx = abs(x - 7.5)\n    val = y + dx * angle_mod\n    if reverse: hue = (1.0 - (val / 10.0 - t) % 1.0) % 1.0\n    else: hue = (val / 10.0 + t) % 1.0\n    if grad_on and grad_colors:\n        n = len(grad_colors)\n        if n == 1:\n            c = grad_colors[0]\n            r, g, b = c[0]/255.0*brightness, c[1]/255.0*brightness, c[2]/255.0*brightness\n        else:\n            p = hue * n\n            idx1 = int(p) % n\n            idx2 = (idx1 + 1) % n\n            frac = p - int(p)\n            c1, c2 = grad_colors[idx1], grad_colors[idx2]\n            r = (c1[0]*(1-frac) + c2[0]*frac) / 255.0 * brightness\n            g = (c1[1]*(1-frac) + c2[1]*frac) / 255.0 * brightness\n            b = (c1[2]*(1-frac) + c2[2]*frac) / 255.0 * brightness\n    else:\n        r, g, b = colorsys.hsv_to_rgb(hue, 1.0, brightness)\n    matrix[base] = int(r * 255)\n    matrix[base+1] = int(g * 255)\n    matrix[base+2] = int(b * 255)"
+}

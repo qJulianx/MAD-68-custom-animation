@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAD68 Pro R — RGB Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-dot"></span>
+        <span class="logo-text">MAD68 <span class="logo-accent">Pro R</span></span>
+      </div>
+      <div class="status-pill" id="statusPill">
+        <span class="status-dot"></span>
+        <span id="statusLabel">Connecting...</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- LIVE PREVIEW -->
+      <section class="preview-section">
+        <div class="section-label">Live Preview</div>
+        <div class="keyboard-outer">
+          <div class="keyboard-bg" id="keyboardBg"></div>
+        </div>
+      </section>
+
+      <!-- CONTROL PANEL -->
+      <div class="bottom-panel">
+        <!-- ANIMATION -->
+        <div class="panel-card anim-card">
+          <div class="card-title">Animation</div>
+          <div class="anim-select-wrap">
+            <select id="animSelect" class="anim-select">
+              <option value="">Loading...</option>
+            </select>
+          </div>
+          <div class="anim-info" id="animInfo">
+            <p id="animDesc" class="anim-desc-text"></p>
+            <button id="resetAnimBtn" class="reset-btn"
+              style="margin-top: 15px; width: 100%; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aaa; border-radius: 6px; cursor: pointer; transition: 0.2s;">Reset Animation Style</button>
+          </div>
+        </div>
+
+        <!-- PARAMETERS -->
+        <div class="panel-card params-card">
+          <div class="card-title">Parameters</div>
+          <div id="slidersWrap" class="sliders-wrap"></div>
+        </div>
+
+        <!-- COLOR -->
+        <div class="panel-card color-card">
+          <div class="card-title">Color</div>
+
+          <div class="rainbow-row">
+            <span class="row-label">Rainbow Mode</span>
+            <label class="toggle">
+              <input type="checkbox" id="rainbowToggle" checked>
+              <span class="toggle-track">
+                <span class="toggle-thumb"></span>
+              </span>
+            </label>
+          </div>
+
+          <div class="presets-label">Presets</div>
+          <div class="presets-row" id="presetsRow">
+            <button class="preset" data-rgb="255,0,255" style="background:hsl(300,100%,50%)"></button>
+            <button class="preset" data-rgb="255,51,102" style="background:hsl(340,100%,60%)"></button>
+            <button class="preset" data-rgb="255,102,0" style="background:hsl(24,100%,50%)"></button>
+            <button class="preset" data-rgb="255,165,0" style="background:hsl(39,100%,50%)"></button>
+            <button class="preset" data-rgb="220,220,0" style="background:hsl(60,100%,43%)"></button>
+            <button class="preset" data-rgb="100,220,0" style="background:hsl(90,100%,43%)"></button>
+            <button class="preset" data-rgb="0,220,0" style="background:hsl(120,100%,43%)"></button>
+            <button class="preset" data-rgb="0,120,255" style="background:hsl(210,100%,50%)"></button>
+            <button class="preset" data-rgb="100,0,255" style="background:hsl(262,100%,50%)"></button>
+          </div>
+
+          <div class="custom-color-row">
+            <span class="row-label">Custom Color</span>
+            <input type="text" class="hex-display" id="hexDisplay" value="#FF0000" maxlength="7">
+          </div>
+
+          <div class="wheel-wrap" id="colorPickerWrap">
+            <canvas id="colorWheel" width="170" height="170"></canvas>
+            <div class="wheel-cursor" id="wheelCursor"></div>
+            <div class="bright-row">
+              <canvas id="brightSlider" width="170" height="18"></canvas>
+              <div class="bright-cursor" id="brightCursor"></div>
+            </div>
+            <div class="rgb-row">
+              <span class="rgb-label">R</span><span id="rgbR" class="rgb-val">255</span>
+              <span class="rgb-label">G</span><span id="rgbG" class="rgb-val">0</span>
+              <span class="rgb-label">B</span><span id="rgbB" class="rgb-val">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRADIENT -->
+        <div class="panel-card gradient-card" id="gradientCard" style="display: none;">
+          <div class="card-title">Gradient</div>
+
+          <div class="rainbow-row">
+            <span class="row-label">Enable Gradient</span>
+            <label class="toggle">
+              <input type="checkbox" id="gradientToggle">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+
+          <div id="gradientContent" class="gradient-content disabled">
+            <div class="slots-row" id="gradientSlotsRow"></div>
+
+            <div class="custom-color-row" style="margin-top:10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+              <span class="row-label">Custom Color</span>
+              <input type="text" class="hex-display" id="gradHexDisplay" value="#FF0000" maxlength="7">
+            </div>
+            <div class="wheel-wrap" id="gradColorPickerWrap">
+              <canvas id="gradColorWheel" width="170" height="170"></canvas>
+              <div class="wheel-cursor" id="gradWheelCursor"></div>
+              <div class="bright-row">
+                <canvas id="gradBrightSlider" width="170" height="18"></canvas>
+                <div class="bright-cursor" id="gradBrightCursor"></div>
+              </div>
+              <div class="rgb-row">
+                <span class="rgb-label">R</span><span id="gradRgbR" class="rgb-val">255</span>
+                <span class="rgb-label">G</span><span id="gradRgbG" class="rgb-val">0</span>
+                <span class="rgb-label">B</span><span id="gradRgbB" class="rgb-val">0</span>
+              </div>
+              <button id="gradRemoveBtn" class="action-btn" style="width: 100%; margin-top: 8px;">Remove Color</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

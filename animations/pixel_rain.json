@@ -1,0 +1,14 @@
+{
+  "id": "pixel_rain",
+  "name": "Pixel Rain",
+  "description": "Pojedyncze piksele spadające w dół klawiatury niczym deszcz (z QMK).",
+  "supports_color": true,
+  "supports_rainbow": true,
+  "default_rainbow": false,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.03, "min": 0.01, "max": 0.1, "step": 0.01, "label": "Prędkość", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" }
+  },
+  "code": "brightness = params.get('brightness', 1.0)\ncolor = params.get('color', [0, 255, 0])\nrainbow = params.get('rainbow', False)\nLY = {'esc':0,'1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0,'0':0,'-':0,'=':0,'backspace':0,'ins':0,'tab':1,'q':1,'w':1,'e':1,'r':1,'t':1,'y':1,'u':1,'i':1,'o':1,'p':1,'[':1,']':1,'\\\\':1,'delete':1,'caps lock':2,'a':2,'s':2,'d':2,'f':2,'g':2,'h':2,'j':2,'k':2,'l':2,';':2,\"'\":2,'enter':2,'pgup':2,'shift':3,'z':3,'x':3,'c':3,'v':3,'b':3,'n':3,'m':3,',':3,'.':3,'/':3,'right shift':3,'up':3,'pgdn':3,'ctrl':4,'left windows':4,'alt':4,'space':4,'alt gr':4,'fn':4,'right ctrl':4,'left':4,'down':4,'right':4}\nfor key_name, virtual_id in key_map.items():\n    kn = key_name.lower()\n    base = virtual_id * 3\n    if base + 2 >= 384:\n        continue\n    x = LAYOUT_X.get(kn, 0)\n    y = LY.get(kn, 0)\n    # Faza spadania zależna od kolumny\n    col_phase = (x * 37) % 100 / 100.0\n    row_val = (t * 5.0 + col_phase * 10.0) % 5.0\n    dist = abs(row_val - y)\n    if dist < 0.8:\n        val = (1.0 - dist / 0.8) * brightness\n    else:\n        val = 0\n    if rainbow:\n        r, g, b = colorsys.hsv_to_rgb(col_phase, 1.0, val)\n    else:\n        r, g, b = color[0]/255.0*val, color[1]/255.0*val, color[2]/255.0*val\n    matrix[base] = int(r * 255)\n    matrix[base+1] = int(g * 255)\n    matrix[base+2] = int(b * 255)"
+}

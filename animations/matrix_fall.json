@@ -1,0 +1,16 @@
+{
+  "id": "matrix_fall",
+  "name": "Matrix Fall",
+  "description": "Zielone kolumny znaków spadają z góry na dół jak w filmie Matrix.",
+  "supports_color": true,
+  "supports_rainbow": false,
+  "default_rainbow": false,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.025, "min": 0.005, "max": 0.1, "step": 0.005, "label": "Prędkość", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" },
+    "reverse": { "default": false, "type": "boolean", "label": "Odwrotna grawitacja" },
+    "glitch": { "default": false, "type": "boolean", "label": "Efekt zakłóceń (Glitch)" }
+  },
+  "code": "brightness = params.get('brightness', 1.0)\ncolor = params.get('color', [0, 255, 70])\nreverse = params.get('reverse', False)\nglitch = params.get('glitch', False)\nLY = {'esc':0,'1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0,'0':0,'-':0,'=':0,'backspace':0,'ins':0,'tab':1,'q':1,'w':1,'e':1,'r':1,'t':1,'y':1,'u':1,'i':1,'o':1,'p':1,'[':1,']':1,'\\\\':1,'delete':1,'caps lock':2,'a':2,'s':2,'d':2,'f':2,'g':2,'h':2,'j':2,'k':2,'l':2,';':2,\"'\":2,'enter':2,'pgup':2,'shift':3,'z':3,'x':3,'c':3,'v':3,'b':3,'n':3,'m':3,',':3,'.':3,'/':3,'right shift':3,'up':3,'pgdn':3,'ctrl':4,'left windows':4,'alt':4,'space':4,'alt gr':4,'fn':4,'right ctrl':4,'left':4,'down':4,'right':4}\n\nfor key_name, virtual_id in key_map.items():\n    kn = key_name.lower()\n    base = virtual_id * 3\n    if base + 2 >= 384:\n        continue\n    x = LAYOUT_X.get(kn, 0)\n    y = LY.get(kn, 0)\n    \n    col_phase = (x * 1.618033) % 1.0\n    col_speed = 0.5 + (int(x * 37) % 10) / 20.0\n    \n    if reverse:\n        head_y = 5.0 - ((t * col_speed * 8.0 + col_phase * 6.0) % 7.0 - 1.0)\n        dist = y - head_y\n    else:\n        head_y = (t * col_speed * 8.0 + col_phase * 6.0) % 7.0 - 1.0\n        dist = head_y - y\n        \n    if glitch and random.random() < 0.02:\n        val = random.random() * brightness\n        r = color[0] / 255.0 * val\n        g = color[1] / 255.0 * val\n        b = color[2] / 255.0 * val\n    else:\n        if 0 <= dist < 1.2:\n            val = (1.0 - dist / 1.2) * brightness\n            r = color[0] / 255.0 * val\n            g = color[1] / 255.0 * val\n            b = color[2] / 255.0 * val\n        elif -2.5 <= dist < 0:\n            val = max(0.0, (1.0 + dist / 2.5)) * brightness * 0.35\n            r = color[0] / 255.0 * val * 0.3\n            g = color[1] / 255.0 * val\n            b = color[2] / 255.0 * val * 0.3\n        else:\n            r = g = b = 0.0\n            \n    matrix[base] = int(min(255, r * 255))\n    matrix[base+1] = int(min(255, g * 255))\n    matrix[base+2] = int(min(255, b * 255))"
+}

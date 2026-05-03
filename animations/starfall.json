@@ -1,0 +1,17 @@
+{
+  "id": "starfall",
+  "name": "Star Fall",
+  "description": "Gwiazdy losowo pojawiają się na klawiszach i powoli gasną.",
+  "supports_color": true,
+  "supports_rainbow": true,
+  "default_rainbow": false,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.02, "min": 0.005, "max": 0.1, "step": 0.005, "label": "Prędkość", "unit": "" },
+    "density": { "default": 0.25, "min": 0.05, "max": 0.6, "step": 0.05, "label": "Gęstość", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" },
+    "twinkle": { "default": false, "type": "boolean", "label": "Efekt migotania" },
+    "random_colors": { "default": false, "type": "boolean", "label": "Wariacje koloru bazowego" }
+  },
+  "code": "speed = params.get('speed', 0.02)\nbrightness = params.get('brightness', 1.0)\ncolor = params.get('color', [255, 255, 255])\nrainbow = params.get('rainbow', False)\ndensity = params.get('density', 0.25)\ntwinkle = params.get('twinkle', False)\nrandom_colors = params.get('random_colors', False)\n\nfor key_name, virtual_id in key_map.items():\n    base = virtual_id * 3\n    if base + 2 >= 384:\n        continue\n    phase = (virtual_id * 2654435761) % 100000 / 100000.0\n    cycle = (t * speed * 3.0 + phase) % 1.0\n    if cycle < density:\n        star_b = (1.0 - cycle / density) ** 2 * brightness\n        if twinkle:\n            tw = (math.sin(t * 20.0 + phase * 100.0) + 1) / 2\n            star_b = star_b * (0.5 + 0.5 * tw)\n    else:\n        star_b = 0.0\n        \n    if star_b < 0.01:\n        matrix[base] = 0\n        matrix[base+1] = 0\n        matrix[base+2] = 0\n        continue\n        \n    if rainbow:\n        hue = phase\n        r, g, b = colorsys.hsv_to_rgb(hue, 1.0, star_b)\n    else:\n        if random_colors:\n            base_hsv = colorsys.rgb_to_hsv(color[0]/255.0, color[1]/255.0, color[2]/255.0)\n            shifted_hue = (base_hsv[0] + (phase - 0.5) * 0.4) % 1.0\n            r, g, b = colorsys.hsv_to_rgb(shifted_hue, base_hsv[1], star_b)\n        else:\n            r = color[0] / 255.0 * star_b\n            g = color[1] / 255.0 * star_b\n            b = color[2] / 255.0 * star_b\n            \n    matrix[base] = int(r * 255)\n    matrix[base+1] = int(g * 255)\n    matrix[base+2] = int(b * 255)"
+}

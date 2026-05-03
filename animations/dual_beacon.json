@@ -1,0 +1,16 @@
+{
+  "id": "dual_beacon",
+  "name": "Dual Beacon",
+  "description": "Dwie latarnie morskie wirujące w przeciwnych kierunkach wokół środka (z QMK).",
+  "supports_color": true,
+  "supports_rainbow": true,
+  "default_rainbow": false,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.015, "min": 0.005, "max": 0.1, "step": 0.005, "label": "Prędkość", "unit": "" },
+    "width": { "default": 0.15, "min": 0.05, "max": 0.5, "step": 0.05, "label": "Szerokość promienia", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" },
+    "reverse": { "default": false, "type": "boolean", "label": "Odwróć kierunek rotacji" }
+  },
+  "code": "brightness = params.get('brightness', 1.0)\ncolor = params.get('color', [255, 0, 0])\nrainbow = params.get('rainbow', False)\nreverse = params.get('reverse', False)\nwidth = params.get('width', 0.15)\n\nLY = {'esc':0,'1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0,'0':0,'-':0,'=':0,'backspace':0,'ins':0,'tab':1,'q':1,'w':1,'e':1,'r':1,'t':1,'y':1,'u':1,'i':1,'o':1,'p':1,'[':1,']':1,'\\\\':1,'delete':1,'caps lock':2,'a':2,'s':2,'d':2,'f':2,'g':2,'h':2,'j':2,'k':2,'l':2,';':2,\"'\":2,'enter':2,'pgup':2,'shift':3,'z':3,'x':3,'c':3,'v':3,'b':3,'n':3,'m':3,',':3,'.':3,'/':3,'right shift':3,'up':3,'pgdn':3,'ctrl':4,'left windows':4,'alt':4,'space':4,'alt gr':4,'fn':4,'right ctrl':4,'left':4,'down':4,'right':4}\n\nfor key_name, virtual_id in key_map.items():\n    kn = key_name.lower()\n    base = virtual_id * 3\n    if base + 2 >= 384:\n        continue\n    x = LAYOUT_X.get(kn, 0)\n    y = LY.get(kn, 0)\n    dx = x - 7.5\n    dy = y - 2.0\n    angle = (math.atan2(dy, dx) / (2 * math.pi)) % 1.0\n    \n    if reverse:\n        diff = (angle - t) % 1.0\n    else:\n        diff = (angle + t) % 1.0\n        \n    d1 = min(diff, 1.0 - diff)\n    diff2 = (diff + 0.5) % 1.0\n    d2 = min(diff2, 1.0 - diff2)\n    d = min(d1, d2)\n    \n    if d < width:\n        intensity = (1.0 - d / width) * brightness\n    else:\n        intensity = 0.0\n        \n    if rainbow:\n        hue = (angle + t) % 1.0\n        r, g, b = colorsys.hsv_to_rgb(hue, 1.0, intensity)\n    else:\n        r = color[0] / 255.0 * intensity\n        g = color[1] / 255.0 * intensity\n        b = color[2] / 255.0 * intensity\n        \n    matrix[base] = int(r * 255)\n    matrix[base+1] = int(g * 255)\n    matrix[base+2] = int(b * 255)"
+}

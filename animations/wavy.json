@@ -1,0 +1,19 @@
+{
+  "id": "wavy",
+  "name": "Rainbow Wave",
+  "description": "Płynna tęczowa fala przebiegająca przez klawiaturę. Wspiera gradientowanie!",
+  "supports_color": true,
+  "supports_rainbow": true,
+  "default_rainbow": true,
+  "supports_gradient": true,
+  "max_colors": 5,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.015, "min": 0.005, "max": 0.1, "step": 0.005, "label": "Prędkość", "unit": "" },
+    "width": { "default": 0.03, "min": 0.01, "max": 0.15, "step": 0.005, "label": "Szerokość fali", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" },
+    "reverse": { "default": false, "type": "boolean", "label": "Odwróć kierunek fali" },
+    "rainbow_v2": { "default": false, "type": "boolean", "label": "Tęcza v2 (Pływający kolor bazowy)" }
+  },
+  "code": "speed = params.get('speed', 0.015)\nwidth = params.get('width', 0.03)\nbrightness = params.get('brightness', 1.0)\nrainbow = params.get('rainbow', True)\ncolor = params.get('color', [255, 0, 0])\nreverse = params.get('reverse', False)\nrainbow_v2 = params.get('rainbow_v2', False)\ngrad_on = params.get('gradientOn', False)\ngrad_colors = [c for c in params.get('gradientColors', []) if sum(c)>0]\nfor key_name, virtual_id in key_map.items():\n    kn = key_name.lower()\n    x_pos = LAYOUT_X.get(kn, 0)\n    if reverse: x_pos = 15.0 - x_pos\n    base = virtual_id * 3\n    if base + 2 >= 384: continue\n    phase = (x_pos * width + t) % 1.0\n    wave = (math.sin(phase * 6.28) + 1) / 2\n    if rainbow:\n        r, g, b = colorsys.hsv_to_rgb(phase, 1.0, brightness)\n    elif grad_on and grad_colors:\n        n = len(grad_colors)\n        if n == 1:\n            c = grad_colors[0]\n            r, g, b = c[0]/255.0*brightness, c[1]/255.0*brightness, c[2]/255.0*brightness\n        else:\n            p = phase * n\n            idx1 = int(p) % n\n            idx2 = (idx1 + 1) % n\n            frac = p - int(p)\n            c1, c2 = grad_colors[idx1], grad_colors[idx2]\n            r = (c1[0]*(1-frac) + c2[0]*frac) / 255.0 * brightness\n            g = (c1[1]*(1-frac) + c2[1]*frac) / 255.0 * brightness\n            b = (c1[2]*(1-frac) + c2[2]*frac) / 255.0 * brightness\n    else:\n        if rainbow_v2:\n            base_hsv = colorsys.rgb_to_hsv(color[0]/255.0, color[1]/255.0, color[2]/255.0)\n            shifted_hue = (base_hsv[0] + wave * 0.3) % 1.0\n            r, g, b = colorsys.hsv_to_rgb(shifted_hue, base_hsv[1], base_hsv[2] * wave * brightness)\n        else:\n            r = color[0] / 255.0 * wave * brightness\n            g = color[1] / 255.0 * wave * brightness\n            b = color[2] / 255.0 * wave * brightness\n    matrix[base] = int(r * 255)\n    matrix[base+1] = int(g * 255)\n    matrix[base+2] = int(b * 255)"
+}

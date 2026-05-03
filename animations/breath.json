@@ -1,0 +1,17 @@
+{
+  "id": "breath",
+  "name": "Breath",
+  "description": "Cała klawiatura oddycha – zapala się i gaśnie. Można wyłączyć synchronizację.",
+  "supports_color": true,
+  "supports_rainbow": true,
+  "default_rainbow": false,
+  "supports_gradient": true,
+  "max_colors": 5,
+  "params": {
+    "fps": { "default": 10, "min": 5, "max": 15, "step": 1, "label": "FPS", "unit": "fps" },
+    "speed": { "default": 0.05, "min": 0.03, "max": 0.09, "step": 0.01, "label": "Prędkość", "unit": "" },
+    "brightness": { "default": 1.0, "min": 0, "max": 1.0, "step": 0.05, "label": "Jasność", "unit": "" },
+    "sync": { "default": true, "type": "boolean", "label": "Synchronizuj klawisze" }
+  },
+  "code": "speed = params.get('speed', 0.05)\nbrightness = params.get('brightness', 1.0)\nrainbow = params.get('rainbow', False)\ncolor = params.get('color', [0, 100, 255])\nsync = params.get('sync', True)\ngrad_on = params.get('gradientOn', False)\ngrad_colors = [c for c in params.get('gradientColors', []) if sum(c)>0]\nfor key_name, virtual_id in key_map.items():\n    base = virtual_id * 3\n    if base + 2 >= 384: continue\n    phase_offset = 0 if sync else (virtual_id * 0.05)\n    pulse = (math.sin(t * speed * 30 + phase_offset) + 1) / 2 * brightness\n    if rainbow:\n        hue = (t * speed * 5 + phase_offset * 0.2) % 1.0\n        r, g, b = colorsys.hsv_to_rgb(hue, 1.0, pulse)\n    elif grad_on and grad_colors:\n        n = len(grad_colors)\n        if n == 1:\n            c = grad_colors[0]\n            r, g, b = c[0]/255.0*pulse, c[1]/255.0*pulse, c[2]/255.0*pulse\n        else:\n            grad_phase = (t * speed * 5 + phase_offset * 0.2) % 1.0\n            p = grad_phase * n\n            idx1 = int(p) % n\n            idx2 = (idx1 + 1) % n\n            frac = p - int(p)\n            c1, c2 = grad_colors[idx1], grad_colors[idx2]\n            r = (c1[0]*(1-frac) + c2[0]*frac) / 255.0 * pulse\n            g = (c1[1]*(1-frac) + c2[1]*frac) / 255.0 * pulse\n            b = (c1[2]*(1-frac) + c2[2]*frac) / 255.0 * pulse\n    else:\n        r = color[0] / 255.0 * pulse\n        g = color[1] / 255.0 * pulse\n        b = color[2] / 255.0 * pulse\n    matrix[base] = int(r * 255)\n    matrix[base+1] = int(g * 255)\n    matrix[base+2] = int(b * 255)"
+}
