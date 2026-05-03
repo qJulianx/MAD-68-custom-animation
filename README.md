@@ -4,6 +4,8 @@
 
 This project provides a custom web-based interface and a Python-powered engine for controlling the RGB lighting on the **MADLIONS MAD 68 Pro** keyboard (and potentially other compatible 68-key models). It bypasses the standard software to give you full control over animations via a sleek dark-mode web panel.
 
+![MAD 68 RGB Panel](panel.png)
+
 ⚠️ **Safety Notice**: This program does **NOT** modify the keyboard's internal firmware in any way. It uses the built-in "Customization" lighting mode to simply send raw color commands to specific keys. The software cannot physically damage your keyboard (the chance is literally 0%), as long as you use reasonable animation parameters. 
 *Tip: We recommend setting the panel's "FPS" to **8-10** and avoiding excessively high animation speeds for the most stable and smooth experience.*
 

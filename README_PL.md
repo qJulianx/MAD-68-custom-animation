@@ -4,6 +4,8 @@
 
 Ten projekt to autorskie narzędzie z interfejsem webowym oraz silnikiem w Pythonie, służące do sterowania podświetleniem RGB w klawiaturze **MADLIONS MAD 68 Pro** (i potencjalnie innych kompatybilnych modelach 68-klawiszowych). Pozwala on pominąć standardowe oprogramowanie i daje pełną kontrolę nad animacjami poprzez nowoczesny panel w przeglądarce.
 
+![MAD 68 RGB Panel](panel.png)
+
 ⚠️ **Bezpieczeństwo**: Ten program **nie modyfikuje** w żaden sposób oprogramowania układowego (firmware) klawiatury. Wykorzystuje on wbudowany tryb oświetlenia "Customization" (Custom) i po prostu wysyła do niej polecenia pokolorowania danych przycisków na odpowiednie kolory. Program nie ma prawa uszkodzić sprzętu. Szansa na to wynosi 0%, o ile zachowuje się zdrowy rozsądek przy ustawianiu parametrów wyświetlania animacji. 
 *Wskazówka: Zalecamy ustawienie parametru "FPS" na poziomie **8-10** i unikanie maksymalnych prędkości animacji, aby zapewnić najwyższą płynność i stabilność.*
 
