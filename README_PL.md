@@ -1,4 +1,4 @@
-# Sterownik RGB dla MADLIONS MAD 68 Pro
+# Panel RGB dla MADLIONS MAD 68 Pro
 
 [Click here for the English version (README.md)](README.md)
 
